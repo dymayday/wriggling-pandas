@@ -1,0 +1,22 @@
+[package]
+name = "wriggling-pandas"
+version = "0.2.0"
+authors = ["meidhy <dymayday@gmail.com>"]
+
+[dependencies]
+rand = "*"
+ggez = "*"
+nalgebra = "*"
+ncollide2d = "*"
+rayon = "*"
+fnv = "*"
+glob = "*"
+chrono = "*"
+# This is the A.I. engine.
+fluffy-penguin = { path = "../fluffy-penguin" }
+# fluffy-penguin = { git = "https://github.com/dymayday/fluffy-penguin.git" }
+slog = "*"
+slog-term = "*"
+slog-async = "*"
+slog-scope = "*"
+toml = "*"
