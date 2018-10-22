@@ -22,15 +22,15 @@ const GAME_SPEED: f32 = DESIRED_FPS as f32 * 2.0;
 const SPEED_STEP: f32 = 5.0;
 // This is the final contdown ! tududu du tududududu...
 // This is the remaining value before next auto evolution pop.
-// const COUNTDOWN: usize = 2_500;
-const COUNTDOWN: usize = 5_000;
+const COUNTDOWN: usize = 500;
+// const COUNTDOWN: usize = 5_000;
 // Every this value tick we trigger a structural mutation.
-const EXPLORATION_TICK: usize = 25;
+const EXPLORATION_TICK: usize = 50;
 // Font size of text that will be printed
 // on the screen to inform the user.
 const FONT_SIZE: u32 = 12;
 // Number of actor per board.
-const ACTOR_NUMBER_PER_BOARD: usize = 32;
+const ACTOR_NUMBER_PER_BOARD: usize = 128;
 // Number of bullet maximum on a gameboard.
 const BULLET_NUMBER_PER_BOARD: usize = ACTOR_NUMBER_PER_BOARD * 4;
 // Number of score point win when a panda shot an other panda.
@@ -55,6 +55,7 @@ pub struct State {
     speed: f32,
     generation: usize,
     countdown: usize,
+    wrap_world: bool,
     save_dir: String,
 }
 
@@ -111,6 +112,7 @@ impl State {
             speed: GAME_SPEED,
             generation: 0,
             countdown: COUNTDOWN,
+            wrap_world: true,
             save_dir: SAVE_DIR.to_string(),
         })
     }
@@ -135,6 +137,15 @@ impl State {
             }
             self.panda_vector = new_panda_vector;
         }
+        self
+    }
+
+
+    /// Determines if the position of each Panda will be wrap in a toric world, or if they will be
+    /// stuck on the imaginary walls of the arena.
+    /// True by default.
+    pub fn wrap_world(mut self, b: bool) -> Self {
+        self.wrap_world = b;
         self
     }
 
@@ -342,11 +353,18 @@ impl State {
 
 
     /// Load the Panda's brains from file.
-    fn load_population_from_file(&mut self, file_name: &str) {
-
-        info!("Loading Game from '{}'.", file_name);
-        self.population = fluffy_penguin::genetic_algorithm::Population::load_from_file(file_name);
-        self.generation = self.population.current_generation;
+    fn load_population_from_file(&mut self, file_name: &str) -> Result<(), ()> {
+        match fluffy_penguin::genetic_algorithm::Population::load_from_file(file_name) {
+            Ok(population) => {
+                self.generation = population.generation_counter;
+                self.population = population;
+                return Ok(())
+            },
+            Err(e) => {
+                crit!("{}", &format!("{:?}", e));
+                return Err(())
+            }
+        }
     }
 
 
@@ -356,13 +374,16 @@ impl State {
 
         let wild_card = &format!("{}/*.bc", SAVE_DIR);
         let mut fpl: Vec<String> = glob(wild_card).expect("Failed to read glob pattern")
-            .filter_map(|p| Some(p.unwrap().to_str().unwrap().to_string() ) )
+            .filter_map(|p| Some(p.unwrap().to_str().unwrap().to_string()))
             .collect::<Vec<String>>();
         fpl.sort();
         debug!("fpl = {:#?}", fpl);
 
         let file_name = fpl.last().unwrap().to_owned();
-        self.load_population_from_file(&file_name);
+        match self.load_population_from_file(&file_name) {
+            Ok(_) => info!("Loading Game from '{}'.", file_name),
+            Err(_) => warn!("Fail to load the game from '{}'.", file_name),
+        };
     }
 
 
@@ -423,13 +444,20 @@ impl event::EventHandler for State {
                 }
 
 
-                // Here we evaluate each specimen in parallele.
+                // Here we evaluate each specimen in parallel.
                 let mut input_state_v: Vec<InputState> = Vec::with_capacity(self.panda_vector.len());
                 self.population.species.par_iter_mut()
                     .map(|specimen| {
                         // Input commands computed by the ANN from the A.I. engine.
                         Panda::build_input_from_ai(&specimen.evaluate())
                     }).collect_into_vec(&mut input_state_v);
+
+                // // Un-parallelized version.
+                // let mut input_state_v: Vec<InputState> = self.population.species.iter_mut()
+                //     .map(|specimen| {
+                //         // Input commands computed by the ANN from the A.I. engine.
+                //         Panda::build_input_from_ai(&specimen.evaluate())
+                //     }).collect();
 
 
                 // Let's update all the pandas.
@@ -438,7 +466,7 @@ impl event::EventHandler for State {
 
                     // Input commands computed by the ANN from the A.I. engine.
                     panda.handle_input(&input_state_v[i], &mut self.bullet_vector, dt);
-                    panda.update(ctx, &body_vector, dt)?;
+                    panda.update(ctx, &body_vector, self.wrap_world, dt)?;
                 }
 
                 // self.panda_vector[0].handle_input(&self.input, &mut self.bullet_vector, dt);

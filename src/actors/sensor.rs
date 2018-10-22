@@ -163,11 +163,6 @@ impl Sensor {
     fn build_output(&mut self) {
         let mut start_idx: usize = 0;
 
-        // self.output[start_idx] = self.direction_vector.x;
-        // start_idx += 1;
-        // self.output[start_idx] = self.direction_vector.y;
-        // start_idx += 1;
-
         // Indications about what we are looking at.
         self.output[start_idx] = self.is_bullet;
         start_idx += 1;

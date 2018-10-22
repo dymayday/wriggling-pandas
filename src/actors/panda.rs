@@ -84,7 +84,7 @@ impl Panda {
     }
 
     /// Updates our panda: cover everything from position to score etc.
-    pub fn update(&mut self, ctx: &mut Context, body_vec: &[Body], dt: f32) -> GameResult<()> {
+    pub fn update(&mut self, ctx: &mut Context, body_vec: &[Body], wrap_world: bool, dt: f32) -> GameResult<()> {
         // Clamp the velocity to the max efficiently
         let norm_sq = self.velocity.norm_squared();
         if norm_sq > MAX_PHYSICS_VEL.powi(2) {
@@ -94,8 +94,11 @@ impl Panda {
         let dv = self.velocity * dt;
         self.pos += dv;
 
-        // self.wrap_position(ctx);
-        self.confine_position(ctx);
+        if wrap_world {
+            self.wrap_position(ctx);
+        } else {
+            self.confine_position(ctx);
+        }
 
         self.isometry.translation.vector.x = self.pos.x;
         self.isometry.translation.vector.y = self.pos.y;
@@ -235,14 +238,17 @@ impl Panda {
         let atan_direction_vector = self.direction_vector.y.atan2(self.direction_vector.x);
 
         // FOV input handling part.
-        // Now it's use to handle the synchronized left and right Sensor movement.
+        // Now it's used to handle the synchronized left and right Sensor movements.
         let future_fov_turn = dt * SENSOR_TURN_RATE * input.fov_axis;
         let future_fov_vector = vec_from_angle(self.sensor_right.facing + future_fov_turn);
         let tan_diff = atan_direction_vector - future_fov_vector.y.atan2(future_fov_vector.x);
 
-        // Only a test on one of the sensor is enough to check if the the next movement is in
+
+        // println!("input.fov_axis = {} , tan_diff = {}", input.fov_axis, tan_diff);
+
+        // Only a test on one of the sensor is enough to check if the next movement is in
         // range of the sensors angle limitation.
-        if -1.0 <= tan_diff && tan_diff <= -0.01 {
+        if -2.0 <= tan_diff && tan_diff <= -0.01 {
             // Open or close sensors in sync.
             self.sensor_right.facing += dt * SENSOR_TURN_RATE * input.fov_axis;
             self.sensor_left.facing -= dt * SENSOR_TURN_RATE * input.fov_axis;
@@ -253,6 +259,7 @@ impl Panda {
             // println!("tan_diff = {}", tan_diff);
             self.fov_length = rs_vector.y.atan2(rs_vector.x) - ls_vector.y.atan2(ls_vector.x);
         }
+
 
         // Here we handle the fire situations.
         if input.fire && self.cooldown < 0.0 {
@@ -268,7 +275,9 @@ impl Panda {
     pub fn build_input_from_ai(input: &[f32]) -> InputState {
         // Thruster handler.
         // let yaxis = input[0].abs();// + -input[1];
+        // let yaxis = input[0].abs() - (input[1].abs() * 0.25);
         let yaxis = input[0].abs() - input[1].abs();
+        // let yaxis = input[0];
 
         // Turn handler.
         // input[1] == Turn left and input[2] == turn right
@@ -278,6 +287,8 @@ impl Panda {
         // Sensor movement handler.
         // let rs_axis = input[3] - input[4];
         let fov_axis = input[4].abs() - input[5].abs();
+        // let fov_axis = input[4].log(10.0) - input[5].log(10.0);
+        // let fov_axis = input[4].fract();
 
         // Handle the firing part based on an arbitrary threshold.
         let fire = {

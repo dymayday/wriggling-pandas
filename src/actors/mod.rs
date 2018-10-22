@@ -41,7 +41,7 @@ const SENSOR_MAX_DIST: f32 = HITBOX_SIZE * 50.0;
 // The radius of a bullet hitbox.
 const BULLET_RADIUS: f32 = HITBOX_RADIUS / 1.5;
 // Bullet speed factor.
-const BULLET_SPEED_FACTOR: f32 = 2.00;
+const BULLET_SPEED_FACTOR: f32 = 3.00;
 // Time to wait between 2 shots in second.
 const SHOOTING_COOLDOWN: f32 = 1.0;
 // Number of output from each Sensor.
