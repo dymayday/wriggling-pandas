@@ -77,10 +77,13 @@ fn print_instructions() {
 }
 
 
+/// Set a custom pretty timestamp format for the logging part.
 fn custom_timestamp_local(io: &mut ::std::io::Write) -> ::std::io::Result<()> {
     write!(io, "{}", chrono::Local::now().format("%Y-%m-%d %H:%M:%S"))
 }
 
+
+/// Initialises our log facility by setting it as async and the timestamp format.
 fn init_log() -> slog::Logger {
     let decorator = slog_term::TermDecorator::new().build();
     let drain = slog_term::CompactFormat::new(decorator)
