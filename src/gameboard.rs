@@ -22,8 +22,8 @@ const GAME_SPEED: f32 = DESIRED_FPS as f32 * 2.0;
 const SPEED_STEP: f32 = 5.0;
 // This is the final contdown ! tududu du tududududu...
 // This is the remaining value before next auto evolution pop.
-const COUNTDOWN: usize = 500;
-// const COUNTDOWN: usize = 5_000;
+// const COUNTDOWN: usize = 500;
+const COUNTDOWN: usize = 5_000;
 // Every this value tick we trigger a structural mutation.
 const EXPLORATION_TICK: usize = 50;
 // Font size of text that will be printed
@@ -137,6 +137,9 @@ impl State {
             }
             self.panda_vector = new_panda_vector;
         }
+
+        // Let's shrink the population size to fit the desired actor size.
+        self.population = self.population.shrink_to(actor_size);
         self
     }
 
@@ -347,8 +350,10 @@ impl State {
 
         let date = Local::now().format("%FT%Hh%Mm%Ss");
         let file_name = format!("{}/{}_Population-gen{:03}.bc", SAVE_DIR, date, self.generation);
-        info!("Saving Population to '{}'.", file_name);
-        self.population.save_to_file(&file_name);
+        match self.population.save_to_file(&file_name) {
+            Ok(_) => info!("Saving Population to '{}'.", file_name),
+            Err(e) => warn!("Fail to save to '{}': {}", file_name, e),
+        };
     }
 
 

@@ -22,7 +22,7 @@ use ncollide2d::shape::Ball;
 
 // The area around a panda that trigger some score.
 // const HITBOX_SIZE: f32 = 2.5;
-const HITBOX_SIZE: f32 = 3.0;
+const HITBOX_SIZE: f32 = 5.0;
 // The radius of the hitbox.
 const HITBOX_RADIUS: f32 = HITBOX_SIZE / 2.0;
 // The maximum velocity our stuff can reach.

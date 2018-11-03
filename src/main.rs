@@ -122,8 +122,8 @@ fn main() {
 
     let state = &mut State::new(ctx)
         .expect("Fail to instantiate the game state.")
-        .with_actor_capacity(64)
-        .wrap_world(false);
+        .with_actor_capacity(32)
+        .wrap_world(true);
 
     println!("{:#?}", ctx.conf);
     print_instructions();
