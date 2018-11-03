@@ -13,8 +13,8 @@ fnv = "*"
 glob = "*"
 chrono = "*"
 # This is the A.I. engine.
-fluffy-penguin = { path = "../fluffy-penguin" }
-# fluffy-penguin = { git = "https://github.com/dymayday/fluffy-penguin.git" }
+# fluffy-penguin = { path = "../fluffy-penguin" }
+fluffy-penguin = { git = "https://github.com/dymayday/fluffy-penguin.git" }
 slog = "*"
 slog-term = "*"
 slog-async = "*"
