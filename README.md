@@ -11,7 +11,7 @@ The project aims at improving my skills in Rust and in game dev just for fun.
 
 ## About
 
-The actual videogame is intended to be played by the A.I. engine ([fluffy-penguin](https://github.com/dymayday/fluffy-penguin)), an artificial neural network combinedd with a genetic algorithm.
+The actual videogame is intended to be played by the A.I. engine ([fluffy-penguin](https://github.com/dymayday/fluffy-penguin)), an artificial neural network combined with a genetic algorithm.
 
 ## Requirements
 
