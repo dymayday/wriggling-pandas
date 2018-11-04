@@ -20,7 +20,7 @@ The actual videogame is intended to be played by the A.I. engine ([fluffy-pengui
 
 ## Configuration
 
-The graphic configuration of the game is set up for my gear, so if you encounter some trouble, first you can check if its config match your screen resolution in the file [conf.toml](resources/conf.toml) and change the width and height accordingly
+The graphic configuration of the game is set up for my gear, so if you encounter some trouble, first you can check if its config match your screen resolution in the file [resources/conf.toml](resources/conf.toml) and change the width and height accordingly
 
 ```toml
 [window_mode]
