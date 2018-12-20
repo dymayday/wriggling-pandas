@@ -17,6 +17,9 @@ The actual videogame is intended to be played by the A.I. engine ([fluffy-pengui
 
 - Rust compiler: See https://www.rust-lang.org or https://doc.rust-lang.org/book/second-edition/ch01-01-installation.html
 - [Graphviz](http://www.graphviz.org/): used to export to SVG the rendered artificial neural networks.
+- [SDL2](https://github.com/Rust-SDL2/rust-sdl2#linux): used by the graphical engine.
+- Alsa: for audio support you need to install a library called `libasound2-dev`.
+- C compiler: the gnu C compiler (`gcc` is usally available in your distro) will do just fine.
 
 ## Configuration
 
