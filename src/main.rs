@@ -107,7 +107,7 @@ fn main() {
             .expect("Failed to buil Context.");
 
     // We add the CARGO_MANIFEST_DIR/resources to the filesystems paths so
-    // we we look in the cargo project for files.
+    // we look in the cargo project for files.
     // Using a ContextBuilder is nice for this because it means that
     // it will look for a conf.toml or icon file or such in
     // this directory when the Context is created.
@@ -131,7 +131,10 @@ fn main() {
     let _guard = slog_scope::set_global_logger(init_log());
 
     match ggez::event::run(ctx, state) {
-        Err(e) => println!("Error encountered during game: {}", e),
-        Ok(_) => println!("Game exited cleanly!"),
+        Err(e) => {
+            crit!("Error encountered during game: {}", e);
+            ::std::process::exit(1);
+        },
+        Ok(_) => info!("Game exited cleanly!"),
     }
 }
